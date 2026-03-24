@@ -1,7 +1,7 @@
 
 # GBFS Bike Monitoring
 
-End-to-end data engineering project for the DataTalksClub DE Zoomcamp course project. This project ingests GBFS bike station data, stores raw events in a data lake, loads curated data into a warehouse, transforms with dbt, and serves a two-tile dashboard.
+This project ingests GBFS bike station data every minute using Kestra, writes raw events to MinIO and Kafka, loads curated records into PostgreSQL, transforms them with dbt, and serves a two-tile Streamlit dashboard (dockerized with docker compose).
 
 City-bike availability changes quickly, but raw GBFS feeds are not directly analytics-friendly. The goal is to build a reproducible pipeline that turns raw bike station events into dashboard-ready metrics for station availability distribution and time trends.
 
@@ -23,11 +23,17 @@ Dashboard preview:
 ## Tech stack
 
  • Docker Compose (to run services in one app stack)
+
  • Kafka + Zookeeper (event stream/message bus and ZooKeeper for metadata/coordination)
+
  • Kestra (orchestrator)
+
  • MinIO (data lake = raw storage)
+
  • PostgreSQL (warehouse) • SQL
+
  • dbt (transformations)
+
  • Streamlit (dashboard) • plotly
 
 
