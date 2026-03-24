@@ -9,6 +9,11 @@ Dashboard preview:
 1. Categorical tile: station counts by availability bucket (low/medium/high)
 2. Temporal tile: bikes available over time
 
+
+More info on urban sharing in Bergen:
+- https://urbansharing.com/
+- https://bergenbysykkel.no/en/
+
 <figure>
 <p align="center">
   <img src="./img/dashboard.gif" alt="Logo" width="900">
