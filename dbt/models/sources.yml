@@ -1,0 +1,8 @@
+version: 2
+
+sources:
+  - name: staging
+    schema: staging
+    tables:
+      - name: station_status_raw
+        description: Raw-ish station status events loaded from Kafka into Postgres staging.

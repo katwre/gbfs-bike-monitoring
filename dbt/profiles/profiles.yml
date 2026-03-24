@@ -1,0 +1,12 @@
+gbfs_bike_monitoring:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: postgres
+      port: 5432
+      user: gbfs
+      password: gbfs
+      dbname: gbfs_monitoring
+      schema: staging
+      threads: 4

@@ -1,0 +1,120 @@
+id: gbfs_station_status_to_minio_kafka
+namespace: gbfs
+
+description: Poll GBFS station_status, store raw snapshot in MinIO, and publish station events to Kafka.
+
+triggers:
+  - id: every_1_min
+    type: io.kestra.plugin.core.trigger.Schedule
+    cron: "*/1 * * * *"
+
+tasks:
+  - id: ingest_status
+    type: io.kestra.plugin.scripts.shell.Commands
+    taskRunner:
+            type: io.kestra.plugin.scripts.runner.docker.Docker
+            networkMode: gbfs-bike-monitoring_default
+    containerImage: python:3.11-slim
+    env:
+      GBFS_STATION_STATUS_URL: https://gbfs.urbansharing.com/bergenbysykkel.no/station_status.json
+      MINIO_ENDPOINT: http://minio:9000
+      MINIO_ACCESS_KEY: minio
+      MINIO_SECRET_KEY: minio123
+      MINIO_BUCKET: gbfs-raw
+      KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+      KAFKA_TOPIC: bike_station_status_raw
+    commands:
+      - pip install --no-cache-dir requests boto3 kafka-python
+      - |
+        python - << 'PY'
+        import json
+        import os
+        from datetime import datetime, timezone
+
+        import boto3
+        import requests
+        from kafka import KafkaProducer
+
+
+        def fetch_station_status(url: str) -> dict:
+            response = requests.get(url, timeout=30)
+            response.raise_for_status()
+            return response.json()
+
+
+        def write_raw_to_minio(payload: dict, snapshot_at: datetime) -> str:
+            s3_client = boto3.client(
+                "s3",
+                endpoint_url=os.environ["MINIO_ENDPOINT"],
+                aws_access_key_id=os.environ["MINIO_ACCESS_KEY"],
+                aws_secret_access_key=os.environ["MINIO_SECRET_KEY"],
+                region_name="us-east-1",
+            )
+
+            bucket = os.environ["MINIO_BUCKET"]
+            existing_buckets = {b["Name"] for b in s3_client.list_buckets().get("Buckets", [])}
+            if bucket not in existing_buckets:
+                s3_client.create_bucket(Bucket=bucket)
+
+            object_key = (
+                f"raw/bike_status/date={snapshot_at:%Y-%m-%d}/"
+                f"hour={snapshot_at:%H}/snapshot_{snapshot_at:%Y%m%dT%H%M%SZ}.json"
+            )
+
+            s3_client.put_object(
+                Bucket=bucket,
+                Key=object_key,
+                Body=json.dumps(payload).encode("utf-8"),
+                ContentType="application/json",
+            )
+            return object_key
+
+
+        def publish_status_to_kafka(payload: dict) -> int:
+            producer = KafkaProducer(
+                bootstrap_servers=os.environ["KAFKA_BOOTSTRAP_SERVERS"],
+                value_serializer=lambda value: json.dumps(value).encode("utf-8"),
+                key_serializer=lambda key: str(key).encode("utf-8"),
+            )
+
+            topic = os.environ["KAFKA_TOPIC"]
+            fallback_ts = payload.get("data", {}).get("last_updated")
+            stations = payload.get("data", {}).get("stations", [])
+            count = 0
+
+            for station in stations:
+                event = {
+                    "station_id": station.get("station_id"),
+                    "num_bikes_available": station.get("num_bikes_available"),
+                    "num_docks_available": station.get("num_docks_available"),
+                    "timestamp": station.get("last_reported") or fallback_ts,
+                }
+                station_id = event["station_id"]
+                if station_id is None:
+                    continue
+
+                producer.send(topic, key=station_id, value=event)
+                count += 1
+
+            producer.flush()
+            producer.close()
+            return count
+
+
+        snapshot_at = datetime.now(timezone.utc)
+        payload = fetch_station_status(os.environ["GBFS_STATION_STATUS_URL"])
+        object_key = write_raw_to_minio(payload, snapshot_at)
+        published_count = publish_status_to_kafka(payload)
+
+        print(
+            json.dumps(
+                {
+                    "status": "ok",
+                    "bucket": os.environ["MINIO_BUCKET"],
+                    "object_key": object_key,
+                    "kafka_topic": os.environ["KAFKA_TOPIC"],
+                    "published_messages": published_count,
+                }
+            )
+        )
+        PY
