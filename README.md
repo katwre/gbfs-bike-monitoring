@@ -83,9 +83,7 @@ The flow of the application:
   ↓
 - Streamlit (2 tiles: availability category and bikes of over time)
   ↓
-- Cloud deployment (Terraform)
-  ↓
-  in progress
+- Cloud deployment (Terraform, AWS EC2)
   ↓
 - GitHub Actions (CI/CD)
 ```
@@ -194,6 +192,7 @@ Required repository secrets:
 - `AWS_SECRET_ACCESS_KEY`
 - `AWS_REGION`
 - `EC2_KEY_NAME`
+- `EXISTING_SECURITY_GROUP_ID` (required for IAM-restricted accounts that cannot create/update security groups)
 
 ## How to run locally with Docker
 
