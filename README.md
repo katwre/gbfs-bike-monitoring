@@ -1,6 +1,7 @@
 
 # GBFS Bike Monitoring
 
+[![CI/CD](https://github.com/katwre/gbfs-bike-monitoring/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/katwre/gbfs-bike-monitoring/actions/workflows/ci-cd.yml)
 [![Live Dashboard](https://img.shields.io/badge/Live%20Dashboard-Streamlit-FF4B4B?logo=streamlit&logoColor=white)](http://34.243.16.160:8501/)
 [![Orchestrator](https://img.shields.io/badge/Orchestrator-Kestra-6C5CE7)](http://34.243.16.160:8080/ui/main/flows)
 [![Raw Storage](https://img.shields.io/badge/Raw%20Storage-MinIO-C72E49?logo=minio&logoColor=white)](http://34.243.16.160:9001/)
@@ -174,6 +175,25 @@ Don't forget to destroy when done!!
 ```bash
 terraform destroy
 ```
+
+## CI/CD (GitHub Actions)
+
+This repository includes a GitHub Actions workflow at `.github/workflows/ci-cd.yml`.
+
+- CI runs on every push and pull request to `main`:
+  - Python dependency install
+  - Python syntax checks
+  - Terraform format and validation checks
+
+- CD is manual via **Actions → CI/CD → Run workflow**:
+  - Always runs `terraform plan`
+  - Runs `terraform apply` only if you set `deploy=true`
+
+Required repository secrets:
+- `AWS_ACCESS_KEY_ID`
+- `AWS_SECRET_ACCESS_KEY`
+- `AWS_REGION`
+- `EC2_KEY_NAME`
 
 ## How to run locally with Docker
 
