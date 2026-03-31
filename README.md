@@ -9,6 +9,7 @@
   <figcaption align="center"><b>Figure.</b> Intro to Kafka and scalable distributed systems. Figure copied from a <a href="https://finematics.com/apache-kafka-explained/">blog post</a>.</figcaption>
 </figure>
 
+--------------------------
 
 My inspiration for this project is to explore data integration at scale through a systems lens. In both machine learning (ML) and computational biology, 
 reliable modeling depends on timely, well-structured data from many sources. At small scale, point-to-point pipelines can work, but as the number of producers and consumers grows, integration complexity quickly becomes `O(N^2)` and difficult to maintain. `Kafka` addresses this by decoupling systems through a central event backbone: `producers` publish once, `consumers` subscribe as needed, and teams share a common interface for `real-time data exchange`. This project reflects my curiosity about applying `distributed data-engineering patterns` beyond traditional domains and learning how scalable streaming architectures can support analytics and ML workflows.
@@ -142,15 +143,27 @@ cd infra/terraform
 cp terraform.tfvars.example terraform.tfvars
 # edit terraform.tfvars with your key_name and repo_url
 terraform init
+# Check what Terraform wants to create:
+terraform plan
+# If the plan looks OK, create the infrastructure:
 terraform apply
 ```
 
-After apply, Terraform prints URLs for:
+What to expect:
+- Terraform creates:
+  - 1 EC2 instance
+  - 1 security group
+- The VM boot script:
+  - installs Docker
+  - clones this github repo
+  - runs docker compose up -d
+
+After apply, Terraform outputs URLs for:
 - Kestra (`:8080`)
 - Streamlit (`:8501`)
 - MinIO console (`:9001`)
 
-Destroy when done:
+Don't forget to destroy when done!!
 ```bash
 terraform destroy
 ```

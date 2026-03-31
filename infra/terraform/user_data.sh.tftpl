@@ -2,7 +2,7 @@
 set -euxo pipefail
 
 apt-get update
-apt-get install -y ca-certificates curl git docker.io docker-compose-plugin
+apt-get install -y ca-certificates curl git docker.io docker-compose
 systemctl enable docker
 systemctl start docker
 
@@ -10,4 +10,4 @@ mkdir -p /opt
 cd /opt
 git clone ${repo_url} gbfs-bike-monitoring
 cd gbfs-bike-monitoring
-docker compose up -d
+docker-compose up -d

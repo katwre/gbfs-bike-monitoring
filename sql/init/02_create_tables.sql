@@ -20,6 +20,16 @@ CREATE TABLE IF NOT EXISTS staging.station_information (
     last_seen_ts TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS staging.station_status_raw (
+    station_id TEXT,
+    bikes_available INTEGER,
+    docks_available INTEGER,
+    event_time BIGINT,
+    ingested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    raw_payload JSONB,
+    UNIQUE (station_id, event_time)
+);
+
 CREATE TABLE IF NOT EXISTS staging.station_status (
     station_id TEXT,
     last_reported BIGINT,
