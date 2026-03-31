@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Environment files
+.env
+
+# Data / local artifacts
+*.log
+*.sqlite
+*.db
+
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+terraform.tfvars
+
+# macOS / editor
+.DS_Store
+.vscode/
+.idea/

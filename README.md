@@ -1,6 +1,10 @@
 
 # GBFS Bike Monitoring
 
+[![Live Dashboard](https://img.shields.io/badge/Live%20Dashboard-Streamlit-FF4B4B?logo=streamlit&logoColor=white)](http://34.243.16.160:8501/)
+[![Orchestrator](https://img.shields.io/badge/Orchestrator-Kestra-6C5CE7)](http://34.243.16.160:8080/ui/main/flows)
+[![Raw Storage](https://img.shields.io/badge/Raw%20Storage-MinIO-C72E49?logo=minio&logoColor=white)](http://34.243.16.160:9001/)
+
 
 <figure>
 <p align="center">
@@ -27,13 +31,17 @@ More info on urban sharing in Bergen:
 - https://urbansharing.com/
 - https://bergenbysykkel.no/en/
 
-<figure>
+
 <p align="center">
-  <img src="./img/dashboard.gif" alt="Logo" width="900">
+  <img src="./img/dashboard_terraform.gif" alt="Logo" width="900">
 </p>
-  <figcaption align="center"><b>Figure.</b> A dashboard preview.</figcaption>
+  <figcaption align="center"><b>Figure.</b> Dashboard running on AWS EC2 provisioned with Terraform.</figcaption>
 </figure>
 
+
+> ⚠️ The live demo endpoint is ephemeral (AWS EC2). The recording above shows the deployed version.
+> To reproduce, follow the [Cloud deployment](#cloud-deployment-aws--terraform) 
+or [local deployment](#how-to-run-locally-with-docker) steps.
 
 > This application was developed as part of the [Data engineering Zoomcamp](https://github.com/DataTalksClub/data-engineering-zoomcamp/tree/main) by [DataTalks.Club](https://datatalks.club/), a free course focused on building production-ready data pipelines.
 
@@ -56,9 +64,6 @@ More info on urban sharing in Bergen:
 
  • Terraform on AWS (cloud deployment)
 
- • CI/CD via GitHub Actions (integration tests)
-
-
 ### Core MVP
 
 The flow of the application:
@@ -78,6 +83,8 @@ The flow of the application:
 - Streamlit (2 tiles: availability category and bikes of over time)
   ↓
 - Cloud deployment (Terraform)
+  ↓
+  in progress
   ↓
 - GitHub Actions (CI/CD)
 ```
@@ -208,6 +215,14 @@ docker run --rm --network gbfs-bike-monitoring_default -v "$PWD":/work -w /work 
 ```
 
 Expected result: JSON output with `status: ok`, `object_key`, and `published_messages`.
+
+
+<figure>
+<p align="center">
+  <img src="./img/dashboard.gif" alt="Logo" width="900">
+</p>
+  <figcaption align="center"><b>Figure.</b> A dashboard preview.</figcaption>
+</figure>
 
 ### To run ingestion in a scheduled way with Kestra:
 
