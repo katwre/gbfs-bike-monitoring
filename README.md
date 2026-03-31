@@ -1,6 +1,18 @@
 
 # GBFS Bike Monitoring
 
+
+<figure>
+<p align="center">
+  <img src="./img/kafka2.png" alt="Logo" width="500">
+</p>
+  <figcaption align="center"><b>Figure.</b> Intro to Kafka and scalable distributed systems. Figure copied from a <a href="https://finematics.com/apache-kafka-explained/">blog post</a>.</figcaption>
+</figure>
+
+
+My inspiration for this project is to explore data integration at scale through a systems lens. In both machine learning (ML) and computational biology, 
+reliable modeling depends on timely, well-structured data from many sources. At small scale, point-to-point pipelines can work, but as the number of producers and consumers grows, integration complexity quickly becomes `O(N^2)` and difficult to maintain. `Kafka` addresses this by decoupling systems through a central event backbone: `producers` publish once, `consumers` subscribe as needed, and teams share a common interface for `real-time data exchange`. This project reflects my curiosity about applying `distributed data-engineering patterns` beyond traditional domains and learning how scalable streaming architectures can support analytics and ML workflows.
+
 This project ingests GBFS bike station data every minute using Kestra, writes raw events to MinIO and Kafka, loads curated records into PostgreSQL, transforms them with dbt, and serves a two-tile Streamlit dashboard (dockerized with docker compose).
 
 City-bike availability changes quickly, but raw GBFS feeds are not directly analytics-friendly. The goal is to build a reproducible pipeline that turns raw bike station events into dashboard-ready metrics for station availability distribution and time trends.
@@ -37,9 +49,13 @@ More info on urban sharing in Bergen:
 
  • PostgreSQL (warehouse) • SQL
 
- • dbt (transformations)
+ • dbt (data transformations)
 
- • Streamlit (dashboard) • plotly
+ • Streamlit (visual dashboard) • plotly
+
+ • Terraform on AWS (cloud deployment)
+
+ • CI/CD via GitHub Actions (integration tests)
 
 
 ### Core MVP
@@ -60,8 +76,9 @@ The flow of the application:
   ↓
 - Streamlit (2 tiles: availability category and bikes of over time)
   ↓
-  Nice extras in progress:
-- GitHub Actions (CI/CD) + Cloud deployment (Terraform)
+- Cloud deployment (Terraform)
+  ↓
+- GitHub Actions (CI/CD)
 ```
 
 
@@ -108,6 +125,34 @@ gbfs-bike-monitoring/
 │   ├── init/
 │   └── queries/
 └── tests/
+```
+
+## Cloud deployment (AWS + Terraform)
+
+This project can be deployed to AWS using Terraform from `infra/terraform`. Great intro to terraform: https://www.youtube.com/watch?v=l5k1ai_GBDE.
+
+Prerequisites:
+- AWS credentials configured locally (for example via `aws configure`)
+- An existing EC2 key pair in your target region
+- Your repository pushed to GitHub/GitLab so EC2 can clone it
+
+Deploy:
+```bash
+cd infra/terraform
+cp terraform.tfvars.example terraform.tfvars
+# edit terraform.tfvars with your key_name and repo_url
+terraform init
+terraform apply
+```
+
+After apply, Terraform prints URLs for:
+- Kestra (`:8080`)
+- Streamlit (`:8501`)
+- MinIO console (`:9001`)
+
+Destroy when done:
+```bash
+terraform destroy
 ```
 
 ## How to run locally with Docker
@@ -180,8 +225,7 @@ This reads every raw snapshot stored in MinIO and inserts station records into `
 #### Run dbt to build mart tables
 
 ```bash
-docker run --rm --network gbfs-bike-monitoring_default -v "$PWD/dbt":/usr/app -w /usr/app python:3.11-slim \
-  bash -lc "apt-get update -qq && apt-get install -y git -qq && pip install dbt-postgres -q && dbt run --profiles-dir profiles"
+docker run --rm --network gbfs-bike-monitoring_default -v "$PWD/dbt":/usr/app -w /usr/app python:3.11-slim bash -lc "apt-get update -qq && apt-get install -y git -qq && pip install dbt-postgres -q && dbt run --profiles-dir profiles"
 ```
 
 This materializes `staging.stg_station_status`, `marts.mart_station_latest`, and `marts.mart_bikes_over_time`.

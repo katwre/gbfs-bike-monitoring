@@ -78,7 +78,7 @@ def insert_records(engine, records):
                 INSERT INTO staging.station_status_raw 
                 (station_id, bikes_available, docks_available, event_time, ingested_at, raw_payload)
                 VALUES (:station_id, :bikes_available, :docks_available, 
-                        to_timestamp(:event_time), now(), :raw_payload)
+                        :event_time, now(), :raw_payload)
                 ON CONFLICT DO NOTHING
             """),
             records
