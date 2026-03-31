@@ -1,7 +1,7 @@
 
 # GBFS Bike Monitoring
 
-[![CI/CD](https://github.com/katwre/gbfs-bike-monitoring/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/katwre/gbfs-bike-monitoring/actions/workflows/ci-cd.yml)
+[![CI/CD](https://img.shields.io/github/actions/workflow/status/katwre/gbfs-bike-monitoring/ci-cd.yml?branch=main&label=CI%2FCD&logo=githubactions&logoColor=white)](https://github.com/katwre/gbfs-bike-monitoring/actions/workflows/ci-cd.yml)
 [![Live Dashboard](https://img.shields.io/badge/Live%20Dashboard-Streamlit-FF4B4B?logo=streamlit&logoColor=white)](http://34.243.16.160:8501/)
 [![Orchestrator](https://img.shields.io/badge/Orchestrator-Kestra-6C5CE7)](http://34.243.16.160:8080/ui/main/flows)
 [![Raw Storage](https://img.shields.io/badge/Raw%20Storage-MinIO-C72E49?logo=minio&logoColor=white)](http://34.243.16.160:9001/)
