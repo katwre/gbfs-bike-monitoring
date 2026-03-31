@@ -34,7 +34,7 @@ More info on urban sharing in Bergen:
 
 
 <p align="center">
-  <img src="./img/dashboard_terraform.gif" alt="Logo" width="900">
+  <img src="./img/dashboard_terraform_cdci.gif" alt="Logo" width="900">
 </p>
   <figcaption align="center"><b>Figure.</b> Dashboard running on AWS EC2 provisioned with Terraform.</figcaption>
 </figure>
