@@ -74,6 +74,12 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
 
+      - name: Validate deploy secrets
+        run: |
+          test -n "${{ secrets.AWS_REGION }}" || (echo "Missing secret: AWS_REGION" && exit 1)
+          test -n "${{ secrets.EC2_KEY_NAME }}" || (echo "Missing secret: EC2_KEY_NAME" && exit 1)
+          test -n "${{ secrets.EXISTING_SECURITY_GROUP_ID }}" || (echo "Missing secret: EXISTING_SECURITY_GROUP_ID" && exit 1)
+
       - name: Generate terraform.tfvars
         working-directory: infra/terraform
         run: |
@@ -82,6 +88,7 @@ jobs:
           key_name = "${{ secrets.EC2_KEY_NAME }}"
           repo_url = "https://github.com/${{ github.repository }}.git"
           instance_type = "t3.medium"
+          existing_security_group_id = "${{ secrets.EXISTING_SECURITY_GROUP_ID }}"
           EOF
 
       - name: Terraform plan
